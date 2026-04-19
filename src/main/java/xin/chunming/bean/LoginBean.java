@@ -7,6 +7,16 @@ public class LoginBean {
     private String password;
     private String md5Password;
 
+    public String getRootURL() {
+        return rootURL;
+    }
+
+    public void setRootURL(String rootURL) {
+        this.rootURL = rootURL;
+    }
+
+    private String rootURL;
+
     private String os;
     private String name;
 
@@ -18,7 +28,7 @@ public class LoginBean {
         this.md5Password = md5Password;
     }
 
-    public LoginBean(String callback, String action, String username, String password, String md5Password, String os, String name, String doube_stack, String chksum, String info, String mac, String ac_id, String ip, String n, String type, String st_, String challengeToken) {
+    public LoginBean(String callback, String action, String username, String password, String md5Password, String os, String name, String doube_stack, String chksum, String info, String mac, String ac_id, String ip, String n, String type, String st_, String challengeToken,String rootURL) {
         this.callback = callback;
         this.action = action;
         this.username = username;
@@ -36,6 +46,7 @@ public class LoginBean {
         this.type = type;
         this.st_ = st_;
         this.challengeToken = challengeToken;
+        this.rootURL=rootURL;
     }
 
     private String doube_stack;

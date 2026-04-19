@@ -10,6 +10,7 @@ import xin.chunming.utils.tools;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class Login {
     public static boolean wanipst(LoginBean loginBean) throws IOException {
         ac_idSetter(loginBean);
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7/cgi-bin/rad_user_info").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/rad_user_info").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -42,7 +43,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -84,13 +85,17 @@ public class Login {
             System.out.println("网络超时!");
             System.err.println(e);
             return false;
+        }catch (SocketTimeoutException e) {
+            System.out.println("网络超时!");
+            System.err.println(e);
+            return false;
         }
 
     }
 
     public static void ac_idSetter(LoginBean loginBean) throws IOException {
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://1.1.1.1").newBuilder().build();
+        HttpUrl url = HttpUrl.parse("http://1.12.3.4").newBuilder().build();
 
         // 2. 构建 Request
         Request request = new Request.Builder()
@@ -134,6 +139,9 @@ public class Login {
         } catch (SocketException e) {
             loginBean.setAc_id("1");
             System.err.println("acid设置发生问题,使用默认:1(acid错误可能会认证失败)");
+        } catch (SocketTimeoutException e) {
+            loginBean.setAc_id("1");
+            System.err.println("acid设置发生问题,使用默认:1(acid错误可能会认证失败)");
         }
 
     }
@@ -158,7 +166,7 @@ public class Login {
 ////            Date date = new Date();
 //            String s1 = "http://192.168.88.7/cgi-bin/get_challenge?callback=" + loginBean.getCallback() +
 //                    "&username=" + loginBean.getUsername() + "&ip=" + loginBean.getIp() + "&_=" + date.getTime();
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7/cgi-bin/get_challenge").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/get_challenge").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("username", loginBean.getUsername())
                 .addQueryParameter("ip", loginBean.getIp())
@@ -173,7 +181,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -201,7 +209,7 @@ public class Login {
 
 
     public static void othersget(LoginBean loginBean) {
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
                 .addQueryParameter("ac_id", loginBean.getAc_id())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -215,7 +223,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -235,7 +243,7 @@ public class Login {
                     "&info=" + build +
                     "&ac_id=" + loginBean.getAc_id() + "&ip="
                     + loginBean.getIp() + "&n=" + loginBean.getN() + "&type=" + loginBean.getType() + "&_=" + date.getTime();*/
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7//cgi-bin/srun_portal").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/srun_portal").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("action", loginBean.getAction())
                 .addQueryParameter("username", loginBean.getUsername())
@@ -260,7 +268,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -272,15 +280,15 @@ public class Login {
             if (response.isSuccessful()) {
                 System.out.println(s);
                 if (s.contains("Login is successful")) {
-                    System.out.println("认证成功!");
+                    System.err.println("认证成功!");
                     return true;
                 } else if (s.contains("Password is error")) {
-                    System.out.println("认证失败 用户名密码错误!");
+                    System.err.println("认证失败 用户名密码错误!");
                     return false;
 
                 } else if (s.contains("login_error")) {
                     System.err.println("认证失败    原因:");
-                    System.out.print(s);
+                    System.err.println(s);
                     return false;
                 }
 
