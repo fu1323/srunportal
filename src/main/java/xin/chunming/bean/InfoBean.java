@@ -8,6 +8,9 @@ public class InfoBean {
     private String username;
     private String password;
     private String ip;
+
+
+
     private String acid;
     private String enc_ver;
 
@@ -52,10 +55,14 @@ public class InfoBean {
     }
 
 
-    public InfoBean(String username, String password, String ip, String acid, String enc_ver) {
+    public InfoBean() {
+    }
+
+    public InfoBean(String username, String password, String ip,  String acid, String enc_ver) {
         this.username = username;
         this.password = password;
         this.ip = ip;
+
         this.acid = acid;
         this.enc_ver = enc_ver;
     }

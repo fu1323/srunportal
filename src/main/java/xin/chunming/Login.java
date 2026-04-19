@@ -9,9 +9,12 @@ import xin.chunming.utils.SrunEncoder;
 import xin.chunming.utils.tools;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Login {
     private static OkHttpClient client = new OkHttpClient.Builder()
@@ -23,8 +26,9 @@ public class Login {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static boolean wanipst(LoginBean loginBean) throws IOException {
+        ac_idSetter(loginBean);
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7//cgi-bin/rad_user_info").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://192.168.88.7/cgi-bin/rad_user_info").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -50,16 +54,86 @@ public class Login {
             if (response.isSuccessful()) {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
-                String wanip = jsonNode.get("client_ip").asText();
-                System.out.println("服务器返回当前ip: "+wanip);
-                String st = jsonNode.get("st").asText();
-                loginBean.setIp(wanip);
-                loginBean.setSt_(st);
-                return true;
+                System.out.println(s);
+                String wanip;
+                if (!jsonNode.has("client_ip")) {
+                    wanip = jsonNode.get("online_ip").asText();
+
+                } else {
+                    wanip = jsonNode.get("client_ip").asText();
+                }
+                if (wanip == null || wanip.isEmpty()) {
+                    System.out.println("服务器返回当前ip: " + wanip);
+                    return false;
+
+                } else {
+                    System.out.println("服务器返回当前ip: " + wanip);
+                    if (jsonNode.has("st")) {
+                        String st = jsonNode.get("st").asText();
+                        loginBean.setSt_(st);
+
+                    }
+                    loginBean.setIp(wanip);
+                    return true;
+                }
             } else {
                 System.out.println("获取ip 发生问题: \n" + s);
                 return false;
             }
+        } catch (SocketException e) {
+            System.out.println("网络超时!");
+            System.err.println(e);
+            return false;
+        }
+
+    }
+
+    public static void ac_idSetter(LoginBean loginBean) throws IOException {
+// 1. 使用 HttpUrl.Builder 自动处理参数编码
+        HttpUrl url = HttpUrl.parse("http://1.1.1.1").newBuilder().build();
+
+        // 2. 构建 Request
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
+                .header("Accept-Encoding", "gzip, deflate")
+                .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
+                .header("Accept-Language", "zh-CN,zh;q=0.9")
+                .header("X-Requested-With", "XMLHttpRequest")
+//                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Cookie", "lang=zh-CN")
+                .header("Connection", "keep-alive")
+                .header("Priority", "u=3, i")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+
+            // 无论成功还是 400/500，都可以通过 response.body() 获取内容
+            String s = response.body() != null ? response.body().string() : "";
+            if (response.isSuccessful()) {
+//                System.out.println(s);
+                Pattern compile = Pattern.compile("ac_id=\\d*");
+                Matcher matcher = compile.matcher(s);
+                if (matcher.find()) {
+                    String group = matcher.group();
+//                   System.out.println(group);
+                    String[] split = group.split("=");
+                    loginBean.setAc_id(split[split.length - 1]);
+                    System.out.println("获取到ac_id为" + split[split.length - 1]);
+
+                } else {
+                    loginBean.setAc_id("1");
+                    System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败)");
+
+                }
+
+            } else {
+                loginBean.setAc_id("1");
+                System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败)");
+            }
+        } catch (SocketException e) {
+            loginBean.setAc_id("1");
+            System.err.println("acid设置发生问题,使用默认:1(acid错误可能会认证失败)");
         }
 
     }
@@ -84,7 +158,7 @@ public class Login {
 ////            Date date = new Date();
 //            String s1 = "http://192.168.88.7/cgi-bin/get_challenge?callback=" + loginBean.getCallback() +
 //                    "&username=" + loginBean.getUsername() + "&ip=" + loginBean.getIp() + "&_=" + date.getTime();
-        HttpUrl url = HttpUrl.parse("http://192.168.88.7//cgi-bin/get_challenge").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://192.168.88.7/cgi-bin/get_challenge").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("username", loginBean.getUsername())
                 .addQueryParameter("ip", loginBean.getIp())
@@ -123,6 +197,29 @@ public class Login {
         }
 
 
+    }
+
+
+    public static void othersget(LoginBean loginBean) {
+        HttpUrl url = HttpUrl.parse("http://192.168.88.7/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
+                .addQueryParameter("ac_id", loginBean.getAc_id())
+                .addQueryParameter("ip", loginBean.getIp())
+                .addQueryParameter("_", String.valueOf(date.getTime()))
+                .build();
+
+        // 2. 构建 Request
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
+                .header("Accept-Encoding", "gzip, deflate")
+                .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
+                .header("Accept-Language", "zh-CN,zh;q=0.9")
+                .header("X-Requested-With", "XMLHttpRequest")
+                .header("Referer", "http://192.168.88.7/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Cookie", "lang=zh-CN")
+                .header("Connection", "keep-alive")
+                .header("Priority", "u=3, i")
+                .build();
     }
 
 
@@ -176,21 +273,33 @@ public class Login {
                 System.out.println(s);
                 if (s.contains("Login is successful")) {
                     System.out.println("认证成功!");
-                }else if (s.contains("Password is error")) {
+                    return true;
+                } else if (s.contains("Password is error")) {
                     System.out.println("认证失败 用户名密码错误!");
+                    return false;
 
+                } else if (s.contains("login_error")) {
+                    System.err.println("认证失败    原因:");
+                    System.out.print(s);
+                    return false;
                 }
-                return true;
+
             } else {
                 System.out.println("登陆 发生问题: \n" + s);
                 return false;
             }
 
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
         }
+        return false;
 
 
     }
 }
+
+
 /*jQuery304048378468105094047_1767178414753({"client_ip":"10.1.41.154","ecode":"E2553","error":"login_error","error_msg":"E2553: Password is error."
 ,"online_ip":"10.1.41.154","res":"login_error","srun_ver":"SRunCGIAuthIntfSvr V1.18 B20221130","st":1767178414})*/
 

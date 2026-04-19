@@ -6,6 +6,7 @@ public class LoginBean {
     private String username;
     private String password;
     private String md5Password;
+
     private String os;
     private String name;
 

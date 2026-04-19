@@ -1,7 +1,7 @@
 package xin.chunming.utils;
 
 import xin.chunming.bean.InfoBean;
-//Thanks to Grok AI 他写的
+
 public class SrunEncoder {
     private static final String PADCHAR = "=";
     private static final String ALPHA = "LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE45QA";

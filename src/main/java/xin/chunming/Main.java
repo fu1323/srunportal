@@ -12,6 +12,7 @@ import java.util.Date;
 public class Main {
     private static String userName;
     private static String password;
+//    private static String macAddr;
 
     public static void main(String[] args) throws Exception {
         System.out.println("++++++++++猫小咪Srun自动登录++++++++++");
@@ -35,11 +36,13 @@ public class Main {
             JsonNode jsonNode = objectMapper.readTree(configJson.toString());
             userName = jsonNode.get("username").asText().strip();
             password = jsonNode.get("password").asText().strip();
+//            System.out.println(password);
+//            macAddr = jsonNode.get("mac_addr").asText().strip();
             if (!userName.equals("填写用户名") && !password.equals("填写密码") && !userName.isEmpty() && !password.isEmpty() && userName != null && password != null) {
                 Date date = new Date();
                 LoginBean lb = new LoginBean("jQuery" + tools.jqueryBuilder() + "_" + date.getTime(), "login", userName, password,
                         null,
-                        "Mac os", "Machintosh", "0", null, null, null, "14",
+                        "Mac os", "Machintosh", "0", null, null, null, null,
                         null, "200", "1", String.valueOf(date.getTime()), null);
 
                 if (Login.wanipst(lb) ? (Login.challengeGet(lb) ? Login.login(lb) : false) : false) {
