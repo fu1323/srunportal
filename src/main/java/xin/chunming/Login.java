@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Login {
     private static OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
@@ -55,7 +57,7 @@ public class Login {
             if (response.isSuccessful()) {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
-                System.out.println(s);
+                System.out.println(ansi().fgBlue().a("serverResponseUserInfo: "+s).reset());
                 String wanip;
                 if (!jsonNode.has("client_ip")) {
                     wanip = jsonNode.get("online_ip").asText();
@@ -124,11 +126,11 @@ public class Login {
 //                   System.out.println(group);
                     String[] split = group.split("=");
                     loginBean.setAc_id(split[split.length - 1]);
-                    System.out.println("获取到ac_id为" + split[split.length - 1]);
+                    System.out.println( ansi().fgGreen().a("获取到ac_id为" + split[split.length - 1]).reset());
 
                 } else {
                     loginBean.setAc_id("1");
-                    System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败)");
+                    System.out.println(ansi().fgRed().a("ac_id未知 使用默认:1 (acid错误可能会认证失败)").reset());
 
                 }
 
@@ -194,11 +196,11 @@ public class Login {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
                 String token = jsonNode.get("challenge").asText();
-                System.out.println("服务器返回token: " + token);
+                System.out.println(ansi().fgGreen().a("服务器返回token: " + token).reset());
                 loginBean.setChallengeToken(token);
                 return true;
             } else {
-                System.out.println("获取token 发生问题: \n" + s);
+                System.err.println("获取token 发生问题: \n" + s);
                 return false;
             }
 
@@ -236,6 +238,8 @@ public class Login {
         System.out.println("计算info加密值....");
         String build = SrunEncoder.build(tools.copyAngGet(loginBean), loginBean.getChallengeToken());
         loginBean.setInfo(build);
+        System.out.println();
+        System.out.println(ansi().fgBrightGreen().a("loginInfo: "+loginBean).reset());
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
                     + loginBean.getName() + "&double_stack=" + loginBean.getDoube_stack() + "&chksum=" +
@@ -278,9 +282,10 @@ public class Login {
             // 无论成功还是 400/500，都可以通过 response.body() 获取内容
             String s = response.body() != null ? response.body().string() : "";
             if (response.isSuccessful()) {
-                System.out.println(s);
+                System.out.println();
+                System.out.println(ansi().fgBlue().a("serverResponse: "+s).reset());
                 if (s.contains("Login is successful")) {
-                    System.err.println("认证成功!");
+                    System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
                     return true;
                 } else if (s.contains("Password is error")) {
                     System.err.println("认证失败 用户名密码错误!");
@@ -293,7 +298,7 @@ public class Login {
                 }
 
             } else {
-                System.out.println("登陆 发生问题: \n" + s);
+                System.err.println("登陆 发生问题: \n" + s);
                 return false;
             }
 

@@ -78,7 +78,7 @@ public class tools {
     /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
     /*84edd967a077c5742f0a9c3c0517f0b9b15d754433a52f70b814a948bd2ec430*/
     public static InfoBean copyAngGet(LoginBean lb) {
-        System.out.println(lb);
+       // System.out.println(lb);
         return new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
     }
     /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/

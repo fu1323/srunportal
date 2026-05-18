@@ -2,6 +2,8 @@ package xin.chunming.utils;
 
 import xin.chunming.bean.InfoBean;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class SrunEncoder {
     private static final String PADCHAR = "=";
     private static final String ALPHA = "LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE45QA";
@@ -15,7 +17,7 @@ public class SrunEncoder {
                 ib.getUsername(), ib.getPassword(), ib.getIp(), ib.getAcid(), ib.getEnc_ver()
         );
 //        System.out.println(ib.getIp());
-        System.out.println(infoJson);
+        System.out.println(ansi().fgBrightGreen().a("userInfo: "+infoJson).reset());
         return encodeUserInfo(infoJson, token);
 
     }

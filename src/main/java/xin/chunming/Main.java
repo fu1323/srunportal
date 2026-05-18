@@ -9,13 +9,15 @@ import xin.chunming.utils.tools;
 import java.io.*;
 import java.util.Date;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Main {
     private static String userName;
     private static String password;
     private static String rootURL;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("++++++++++猫小咪Srun自动登录++++++++++");
+        System.out.println(ansi().fgBrightCyan().a("++++++++++猫小咪Srun自动登录++++++++++").reset());
         String path = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 
         // 2. 处理路径（如果是 JAR 运行，获取其父目录）
@@ -47,7 +49,7 @@ public class Main {
                         null, "200", "1", String.valueOf(date.getTime()), null,rootURL);
 
                 if (Login.wanipst(lb) ? (Login.challengeGet(lb) ? Login.login(lb) : false) : false) {
-                    System.out.println("成功!");
+                    System.out.println(ansi().fgBrightCyan().a("成功!").reset());
                 } else System.err.println("失败!");
 
 
