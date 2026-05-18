@@ -70,7 +70,7 @@ public class Login {
                     return false;
 
                 } else {
-                    System.out.println("服务器返回当前ip: " + wanip);
+                    System.out.println(ansi().fgBlue().a("服务器返回当前ip: " + wanip));
                     if (jsonNode.has("st")) {
                         String st = jsonNode.get("st").asText();
                         loginBean.setSt_(st);
@@ -80,15 +80,15 @@ public class Login {
                     return true;
                 }
             } else {
-                System.out.println("获取ip 发生问题: \n" + s);
+                System.err.println("获取ip 发生问题: \n" + s);
                 return false;
             }
         } catch (SocketException e) {
-            System.out.println("网络超时!");
+            System.err.println("网络超时!");
             System.err.println(e);
             return false;
         }catch (SocketTimeoutException e) {
-            System.out.println("网络超时!");
+            System.err.println("网络超时!");
             System.err.println(e);
             return false;
         }
@@ -126,7 +126,7 @@ public class Login {
 //                   System.out.println(group);
                     String[] split = group.split("=");
                     loginBean.setAc_id(split[split.length - 1]);
-                    System.out.println( ansi().fgGreen().a("获取到ac_id为" + split[split.length - 1]).reset());
+                    System.out.println( ansi().fgBlue().a("获取到ac_id为" + split[split.length - 1]).reset());
 
                 } else {
                     loginBean.setAc_id("1");
@@ -196,7 +196,7 @@ public class Login {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
                 String token = jsonNode.get("challenge").asText();
-                System.out.println(ansi().fgGreen().a("服务器返回token: " + token).reset());
+                System.out.println(ansi().fgBlue().a("服务器返回token: " + token).reset());
                 loginBean.setChallengeToken(token);
                 return true;
             } else {
