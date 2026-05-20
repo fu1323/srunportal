@@ -4,6 +4,7 @@ package xin.chunming;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
+import xin.chunming.bean.InfoBean;
 import xin.chunming.bean.LoginBean;
 import xin.chunming.utils.SrunEncoder;
 import xin.chunming.utils.tools;
@@ -14,6 +15,7 @@ import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -236,10 +238,12 @@ public class Login {
     public static boolean login(LoginBean loginBean) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         loginBean.setMd5Password(tools.passwordCaculator(loginBean.getChallengeToken(), loginBean.getPassword()));
         System.out.println("计算info加密值....");
-        String build = SrunEncoder.build(tools.copyAngGet(loginBean), loginBean.getChallengeToken());
+        Function<LoginBean, InfoBean> convate = (lb)-> new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
+
+        String build = SrunEncoder.build( convate.apply(loginBean), loginBean.getChallengeToken());
         loginBean.setInfo(build);
         System.out.println();
-        System.out.println(ansi().fgBrightGreen().a("loginInfo: "+loginBean).reset());
+        System.out.println(ansi().fgBrightGreen().a("loginInfo: "+loginBean.toString().replace(loginBean.getPassword(),"***")).reset());
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
                     + loginBean.getName() + "&double_stack=" + loginBean.getDoube_stack() + "&chksum=" +

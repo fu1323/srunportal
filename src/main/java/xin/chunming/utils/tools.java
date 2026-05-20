@@ -11,6 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Random;
+import java.util.function.Function;
 
 public class tools {
     /*var str = token + username;
@@ -23,25 +24,25 @@ public class tools {
     public static String chkSumCaculator(LoginBean lb) {
 //        System.out.println(lb);
         /*
-        *
-        *
-        *
-        *
-        *
-        *   b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * 24198001
-        * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * a9b098794d85f8b0916498da727abd1fb2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * 14
-        * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * 10.1.41.154
-        * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * 200
-        * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * 1
-        * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
-        * {SRBX1}OhPyxuFP/CPHyCBkPPVmeeYk1tOibV2mihhYqGfYGqoUKzg+vZ8o8PRm+zS7pK627a3BRM0T/4aNatiN08X1lObWNee2UGJRXHc0HWHtXx6MYZoaN+Q4yFNo9myOlsRpNyJ0f+==
-        * */
+         *
+         *
+         *
+         *
+         *
+         *   b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * 24198001
+         * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * a9b098794d85f8b0916498da727abd1fb2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * 14
+         * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * 10.1.41.154
+         * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * 200
+         * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * 1
+         * b2917719ef582e4ee071662e02c6f4eb5c3ec08bf89459360e8092be789258ac
+         * {SRBX1}OhPyxuFP/CPHyCBkPPVmeeYk1tOibV2mihhYqGfYGqoUKzg+vZ8o8PRm+zS7pK627a3BRM0T/4aNatiN08X1lObWNee2UGJRXHc0HWHtXx6MYZoaN+Q4yFNo9myOlsRpNyJ0f+==
+         * */
         String pre = lb.getChallengeToken() + lb.getUsername() +
                 lb.getChallengeToken() + lb.getMd5Password() +
                 lb.getChallengeToken() + lb.getAc_id() +
@@ -74,12 +75,16 @@ public class tools {
         /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
 
     }
-
-    /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
-    /*84edd967a077c5742f0a9c3c0517f0b9b15d754433a52f70b814a948bd2ec430*/
-    public static InfoBean copyAngGet(LoginBean lb) {
-       // System.out.println(lb);
-        return new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
-    }
-    /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
 }
+
+/*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
+/*84edd967a077c5742f0a9c3c0517f0b9b15d754433a52f70b814a948bd2ec430*/
+//    public static InfoBean copyAngGet(LoginBean lb) {
+//       // System.out.println(lb);
+//        Function<LoginBean,InfoBean> convate = (logbean)->{
+//            new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
+//
+//        };
+//       // return
+//    /*{"username":"24198001","password":"ABC123","ip":"10.1.122.27","acid":"14","enc_ver":"srun_bx1"}*/
+//}

@@ -17,7 +17,7 @@ public class SrunEncoder {
                 ib.getUsername(), ib.getPassword(), ib.getIp(), ib.getAcid(), ib.getEnc_ver()
         );
 //        System.out.println(ib.getIp());
-        System.out.println(ansi().fgBrightGreen().a("userInfo: "+infoJson).reset());
+        System.out.println(ansi().fgBrightGreen().a("userInfo: "+infoJson.replace(ib.getPassword(),"***")).reset());
         return encodeUserInfo(infoJson, token);
 
     }
