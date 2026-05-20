@@ -33,7 +33,7 @@ public class Login {
     public static boolean wanipst(LoginBean loginBean) throws IOException {
         ac_idSetter(loginBean);
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/rad_user_info").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/rad_user_info").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -47,7 +47,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -59,7 +59,7 @@ public class Login {
             if (response.isSuccessful()) {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
-                System.out.println(ansi().fgBlue().a("serverResponseUserInfo: "+s).reset());
+                System.out.println(ansi().fgBlue().a("serverResponseUserInfo: " + s).reset());
                 String wanip;
                 if (!jsonNode.has("client_ip")) {
                     wanip = jsonNode.get("online_ip").asText();
@@ -82,16 +82,16 @@ public class Login {
                     return true;
                 }
             } else {
-                System.err.println("获取ip 发生问题: \n" + s);
+                System.out.println(ansi().fgRed().a("获取ip 发生问题: \n" + s).reset());
                 return false;
             }
         } catch (SocketException e) {
-            System.err.println("网络超时!");
-            System.err.println(e);
+            System.out.println(ansi().fgRed().a("网络超时!").reset());
+            System.out.println(ansi().fgRed().a(e).reset());
             return false;
-        }catch (SocketTimeoutException e) {
-            System.err.println("网络超时!");
-            System.err.println(e);
+        } catch (SocketTimeoutException e) {
+            System.out.println(ansi().fgRed().a("网络超时!").reset());
+            System.out.println(ansi().fgRed().a(e).reset());
             return false;
         }
 
@@ -128,7 +128,7 @@ public class Login {
 //                   System.out.println(group);
                     String[] split = group.split("=");
                     loginBean.setAc_id(split[split.length - 1]);
-                    System.out.println( ansi().fgBlue().a("获取到ac_id为" + split[split.length - 1]).reset());
+                    System.out.println(ansi().fgBlue().a("获取到ac_id为" + split[split.length - 1]).reset());
 
                 } else {
                     loginBean.setAc_id("1");
@@ -142,10 +142,10 @@ public class Login {
             }
         } catch (SocketException e) {
             loginBean.setAc_id("1");
-            System.err.println("acid设置发生问题,使用默认:1(acid错误可能会认证失败)");
+            System.out.println(ansi().fgRed().a("acid设置发生问题,使用默认:1(acid错误可能会认证失败)").reset());
         } catch (SocketTimeoutException e) {
             loginBean.setAc_id("1");
-            System.err.println("acid设置发生问题,使用默认:1(acid错误可能会认证失败)");
+            System.out.println(ansi().fgRed().a("acid设置发生问题,使用默认:1(acid错误可能会认证失败)").reset());
         }
 
     }
@@ -170,7 +170,7 @@ public class Login {
 ////            Date date = new Date();
 //            String s1 = "http://192.168.88.7/cgi-bin/get_challenge?callback=" + loginBean.getCallback() +
 //                    "&username=" + loginBean.getUsername() + "&ip=" + loginBean.getIp() + "&_=" + date.getTime();
-        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/get_challenge").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/get_challenge").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("username", loginBean.getUsername())
                 .addQueryParameter("ip", loginBean.getIp())
@@ -185,7 +185,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -202,7 +202,7 @@ public class Login {
                 loginBean.setChallengeToken(token);
                 return true;
             } else {
-                System.err.println("获取token 发生问题: \n" + s);
+                System.out.println(ansi().fgRed().a("获取token 发生问题: \n" + s).reset());
                 return false;
             }
 
@@ -213,7 +213,7 @@ public class Login {
 
 
     public static void othersget(LoginBean loginBean) {
-        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
                 .addQueryParameter("ac_id", loginBean.getAc_id())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -227,7 +227,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -238,12 +238,13 @@ public class Login {
     public static boolean login(LoginBean loginBean) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         loginBean.setMd5Password(tools.passwordCaculator(loginBean.getChallengeToken(), loginBean.getPassword()));
         System.out.println("计算info加密值....");
-        Function<LoginBean, InfoBean> convate = (lb)-> new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
+        Function<LoginBean, InfoBean> convate = (lb) -> new InfoBean(lb.getUsername(), lb.getPassword(), lb.getIp(), lb.getAc_id(), "srun_bx1");
 
-        String build = SrunEncoder.build( convate.apply(loginBean), loginBean.getChallengeToken());
+        String build = SrunEncoder.build(convate.apply(loginBean), loginBean.getChallengeToken());
         loginBean.setInfo(build);
+        loginBean.setChksum(tools.chkSumCaculator(loginBean));
         System.out.println();
-        System.out.println(ansi().fgBrightGreen().a("loginInfo: "+loginBean.toString().replace(loginBean.getPassword(),"***")).reset());
+        System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
                     + loginBean.getName() + "&double_stack=" + loginBean.getDoube_stack() + "&chksum=" +
@@ -251,7 +252,7 @@ public class Login {
                     "&info=" + build +
                     "&ac_id=" + loginBean.getAc_id() + "&ip="
                     + loginBean.getIp() + "&n=" + loginBean.getN() + "&type=" + loginBean.getType() + "&_=" + date.getTime();*/
-        HttpUrl url = HttpUrl.parse("http://"+loginBean.getRootURL()+"/cgi-bin/srun_portal").newBuilder()
+        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/srun_portal").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("action", loginBean.getAction())
                 .addQueryParameter("username", loginBean.getUsername())
@@ -259,7 +260,7 @@ public class Login {
                 .addQueryParameter("os", loginBean.getOs())
                 .addQueryParameter("name", loginBean.getName())
                 .addQueryParameter("double_stack", loginBean.getDoube_stack())
-                .addQueryParameter("chksum", tools.chkSumCaculator(loginBean))
+                .addQueryParameter("chksum", loginBean.getChksum())
                 .addQueryParameter("info", build)
                 .addQueryParameter("ac_id", loginBean.getAc_id())
                 .addQueryParameter("ip", loginBean.getIp())
@@ -276,7 +277,7 @@ public class Login {
                 .header("Accept", "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01")
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("X-Requested-With", "XMLHttpRequest")
-                .header("Referer", "http://"+loginBean.getRootURL()+"/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
+                .header("Referer", "http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=" + loginBean.getAc_id() + "&nas_ip=10.0.50.2&theme=pro&wlanuserip=" + loginBean.getIp() + "&wlanusermac=9E-B0-81-11-24-42")
                 .header("Cookie", "lang=zh-CN")
                 .header("Connection", "keep-alive")
                 .header("Priority", "u=3, i")
@@ -287,27 +288,27 @@ public class Login {
             String s = response.body() != null ? response.body().string() : "";
             if (response.isSuccessful()) {
                 System.out.println();
-                System.out.println(ansi().fgBlue().a("serverResponse: "+s).reset());
+                System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
                 if (s.contains("Login is successful")) {
                     System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
                     return true;
                 } else if (s.contains("Password is error")) {
-                    System.err.println("认证失败 用户名密码错误!");
+                    System.out.println(ansi().fgRed().a("认证失败 用户名密码错误!").reset());
                     return false;
 
                 } else if (s.contains("login_error")) {
-                    System.err.println("认证失败    原因:");
-                    System.err.println(s);
+                    System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
+                    System.out.println(ansi().fgRed().a(s).reset());
                     return false;
                 }
 
             } else {
-                System.err.println("登陆 发生问题: \n" + s);
+                System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
                 return false;
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(ansi().fgRed().a(e).reset());
             return false;
         }
         return false;

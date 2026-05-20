@@ -50,11 +50,11 @@ public class Main {
 
                 if (Login.wanipst(lb) ? (Login.challengeGet(lb) ? Login.login(lb) : false) : false) {
                     System.out.println(ansi().fgBrightCyan().a("成功!").reset());
-                } else System.err.println("失败!");
+                } else System.out.println(ansi().fgRed().a("失败!").reset());
 
 
             } else {
-                System.err.println("配置文件有问题!");
+                System.out.println(ansi().fgRed().a("配置文件有问题!").reset());
                 boolean delete = configFile.delete();
                 if (delete) {
                     BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(configFile));
@@ -67,7 +67,7 @@ public class Main {
             }
 
         } else {
-            System.out.println("配置文件不存在,已生成,请填写srun_config.json! ");
+            System.out.println(ansi().fgRed().a("配置文件不存在,已生成,请填写srun_config.json! ").reset());
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(configFile));
             bufferedWriter.write("{ \"username\":\"此处请填写用户名\",\"password\":\"此处请填写密码(后面root_url为认证服务器地址,按实际修改 默认192.168.88.7)\",\"root_url\":\"192.168.88.7\"}");
             bufferedWriter.flush();
