@@ -15,6 +15,7 @@ import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,20 +133,23 @@ public class Login {
 
                 } else {
                     loginBean.setAc_id("1");
-                    System.out.println(ansi().fgRed().a("ac_id未知 使用默认:1 (acid错误可能会认证失败)").reset());
-
+                    System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                    new Scanner(System.in).nextLine();
                 }
 
             } else {
                 loginBean.setAc_id("1");
-                System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败)");
+                System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                new Scanner(System.in).nextLine();
             }
         } catch (SocketException e) {
             loginBean.setAc_id("1");
-            System.out.println(ansi().fgRed().a("acid设置发生问题,使用默认:1(acid错误可能会认证失败)").reset());
+            System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            new Scanner(System.in).nextLine();
         } catch (SocketTimeoutException e) {
             loginBean.setAc_id("1");
-            System.out.println(ansi().fgRed().a("acid设置发生问题,使用默认:1(acid错误可能会认证失败)").reset());
+            System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            new Scanner(System.in).nextLine();
         }
 
     }
