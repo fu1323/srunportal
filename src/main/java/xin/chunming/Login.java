@@ -3,6 +3,7 @@ package xin.chunming;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import xin.chunming.bean.InfoBean;
 import xin.chunming.bean.LoginBean;
@@ -22,19 +23,26 @@ import java.util.regex.Pattern;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
+@Slf4j
 public class Login {
-    private static OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
-            .build();
 
+    public static void setClient(OkHttpClient client) {
+        Login.client = client;
+    }
+
+    public static void setTmpurl(String tmpurl) {
+        Login.tmpurl = tmpurl;
+    }
+
+    private static OkHttpClient client;
+    private static String tmpurl = "";
     private static Date date = new Date();
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static boolean wanipst(LoginBean loginBean) throws IOException {
         ac_idSetter(loginBean);
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/rad_user_info").newBuilder()
+        HttpUrl url = HttpUrl.parse(loginBean.getRootURL() + "/cgi-bin/rad_user_info").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -61,6 +69,8 @@ public class Login {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
                 System.out.println(ansi().fgBlue().a("serverResponseUserInfo: " + s).reset());
+
+                log.info("serverResponseUserInfo: " + s);
                 String wanip;
                 if (!jsonNode.has("client_ip")) {
                     wanip = jsonNode.get("online_ip").asText();
@@ -70,16 +80,19 @@ public class Login {
                 }
                 if (wanip == null || wanip.isEmpty()) {
                     System.out.println("服务器返回当前ip: " + wanip);
+                    log.info("服务器返回当前ip: " + wanip);
                     return false;
 
                 } else {
                     System.out.println(ansi().fgBlue().a("服务器返回当前ip: " + wanip));
+                    log.info("服务器返回当前ip: " + wanip);
                     if (jsonNode.has("st")) {
                         String st = jsonNode.get("st").asText();
                         loginBean.setSt_(st);
 
                     }
                     loginBean.setIp(wanip);
+                    response.close();
                     return true;
                 }
             } else {
@@ -89,10 +102,17 @@ public class Login {
         } catch (SocketException e) {
             System.out.println(ansi().fgRed().a("网络超时!").reset());
             System.out.println(ansi().fgRed().a(e).reset());
+
+            log.info("网络超时!");
+            log.info(e.toString());
             return false;
         } catch (SocketTimeoutException e) {
             System.out.println(ansi().fgRed().a("网络超时!").reset());
             System.out.println(ansi().fgRed().a(e).reset());
+
+            log.info("网络超时!");
+            log.info(e.toString());
+
             return false;
         }
 
@@ -100,7 +120,8 @@ public class Login {
 
     public static void ac_idSetter(LoginBean loginBean) throws IOException {
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-        HttpUrl url = HttpUrl.parse("http://1.12.3.4").newBuilder().build();
+       // System.out.println(tmpurl);
+        HttpUrl url = HttpUrl.parse(tmpurl.isBlank()?"http://"+ loginBean.getTestip():tmpurl).newBuilder().build();
 
         // 2. 构建 Request
         Request request = new Request.Builder()
@@ -120,6 +141,7 @@ public class Login {
 
             // 无论成功还是 400/500，都可以通过 response.body() 获取内容
             String s = response.body() != null ? response.body().string() : "";
+            System.out.println(response.code());
             if (response.isSuccessful()) {
 //                System.out.println(s);
                 Pattern compile = Pattern.compile("ac_id=\\d*");
@@ -133,22 +155,31 @@ public class Login {
 
                 } else {
                     loginBean.setAc_id("1");
-                    System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                    //  System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                    log.info("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
                     new Scanner(System.in).nextLine();
                 }
 
+                response.close();
             } else {
                 loginBean.setAc_id("1");
-                System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                //  System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+                log.info("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+
                 new Scanner(System.in).nextLine();
             }
+            response.close();
         } catch (SocketException e) {
             loginBean.setAc_id("1");
-            System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            //  System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            log.info("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+
             new Scanner(System.in).nextLine();
         } catch (SocketTimeoutException e) {
             loginBean.setAc_id("1");
-            System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            //   System.out.println("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+            log.info("ac_id未知 使用默认:1 (acid错误可能会认证失败) 回车继续");
+
             new Scanner(System.in).nextLine();
         }
 
@@ -174,7 +205,7 @@ public class Login {
 ////            Date date = new Date();
 //            String s1 = "http://192.168.88.7/cgi-bin/get_challenge?callback=" + loginBean.getCallback() +
 //                    "&username=" + loginBean.getUsername() + "&ip=" + loginBean.getIp() + "&_=" + date.getTime();
-        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/get_challenge").newBuilder()
+        HttpUrl url = HttpUrl.parse(loginBean.getRootURL() + "/cgi-bin/get_challenge").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("username", loginBean.getUsername())
                 .addQueryParameter("ip", loginBean.getIp())
@@ -202,14 +233,17 @@ public class Login {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
                 JsonNode jsonNode = objectMapper.readTree(s);
                 String token = jsonNode.get("challenge").asText();
-                System.out.println(ansi().fgBlue().a("服务器返回token: " + token).reset());
+                //  System.out.println(ansi().fgBlue().a("服务器返回token: " + token).reset());
+                log.info("服务器返回token: " + token);
                 loginBean.setChallengeToken(token);
+                response.close();
                 return true;
             } else {
-                System.out.println(ansi().fgRed().a("获取token 发生问题: \n" + s).reset());
+                //    System.out.println(ansi().fgRed().a("获取token 发生问题: \n" + s).reset());
+                log.info("获取token 发生问题: \n" + s);
+                response.close();
                 return false;
             }
-
         }
 
 
@@ -217,7 +251,7 @@ public class Login {
 
 
     public static void othersget(LoginBean loginBean) {
-        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
+        HttpUrl url = HttpUrl.parse( loginBean.getRootURL() + "/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
                 .addQueryParameter("ac_id", loginBean.getAc_id())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -249,6 +283,7 @@ public class Login {
         loginBean.setChksum(tools.chkSumCaculator(loginBean));
         System.out.println();
         System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
+        log.info("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***"));
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
                     + loginBean.getName() + "&double_stack=" + loginBean.getDoube_stack() + "&chksum=" +
@@ -256,7 +291,7 @@ public class Login {
                     "&info=" + build +
                     "&ac_id=" + loginBean.getAc_id() + "&ip="
                     + loginBean.getIp() + "&n=" + loginBean.getN() + "&type=" + loginBean.getType() + "&_=" + date.getTime();*/
-        HttpUrl url = HttpUrl.parse("http://" + loginBean.getRootURL() + "/cgi-bin/srun_portal").newBuilder()
+        HttpUrl url = HttpUrl.parse( loginBean.getRootURL() + "/cgi-bin/srun_portal").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("action", loginBean.getAction())
                 .addQueryParameter("username", loginBean.getUsername())
@@ -293,25 +328,31 @@ public class Login {
             if (response.isSuccessful()) {
                 System.out.println();
                 System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
+                log.info("serverResponse: " + s);
                 if (s.contains("Login is successful")) {
                     System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
+                    log.info("认证成功!");
                     return true;
                 } else if (s.contains("Password is error")) {
                     System.out.println(ansi().fgRed().a("认证失败 用户名密码错误!").reset());
+                    log.info("认证失败 用户名密码错误!");
                     return false;
 
                 } else if (s.contains("login_error")) {
                     System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
+                    log.info("认证失败    原因:");
                     System.out.println(ansi().fgRed().a(s).reset());
                     return false;
                 }
 
             } else {
                 System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
+                log.info("登陆 发生问题: \n" + s);
                 return false;
             }
 
         } catch (Exception e) {
+            loginBean.setAc_id(e.toString());
             System.out.println(ansi().fgRed().a(e).reset());
             return false;
         }

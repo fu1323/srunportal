@@ -6,6 +6,18 @@ public class LoginBean {
     private String username;
     private String password;
     private String md5Password;
+private String testip;
+
+    public LoginBean() {
+    }
+
+    public String getTestip() {
+        return testip;
+    }
+
+    public void setTestip(String testip) {
+        this.testip = testip;
+    }
 
     public String getRootURL() {
         return rootURL;

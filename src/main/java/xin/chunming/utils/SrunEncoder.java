@@ -1,9 +1,10 @@
 package xin.chunming.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import xin.chunming.bean.InfoBean;
 
 import static org.fusesource.jansi.Ansi.ansi;
-
+@Slf4j
 public class SrunEncoder {
     private static final String PADCHAR = "=";
     private static final String ALPHA = "LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE45QA";
@@ -16,8 +17,9 @@ public class SrunEncoder {
                 "{\"username\":\"%s\",\"password\":\"%s\",\"ip\":\"%s\",\"acid\":\"%s\",\"enc_ver\":\"%s\"}",
                 ib.getUsername(), ib.getPassword(), ib.getIp(), ib.getAcid(), ib.getEnc_ver()
         );
+        log.info("userInfo: "+infoJson.replace(ib.getPassword(),"***"));
 //        System.out.println(ib.getIp());
-        System.out.println(ansi().fgBrightGreen().a("userInfo: "+infoJson.replace(ib.getPassword(),"***")).reset());
+       // System.out.println(ansi().fgBrightGreen().a("userInfo: "+infoJson.replace(ib.getPassword(),"***")).reset());
         return encodeUserInfo(infoJson, token);
 
     }
