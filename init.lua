@@ -7,9 +7,9 @@ local wifiWatcher = nil
 function wifiChangedCallback(watcher, message, interface)
     local currentWifi = hs.wifi.currentNetwork()
     -- 替换为你要自动认证的 Wi-Fi 名称
-    if currentWifi == "SYNU" then
+    if currentWifi == "xxx" then
         -- 运行你的认证脚本
-        hs.task.new("SYNULogin.sh", nil):start()
+        hs.task.new("xxx.sh", nil):start()
 --         .sh里用java-jar 运行此app
     end
 end
