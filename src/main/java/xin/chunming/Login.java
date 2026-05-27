@@ -152,6 +152,7 @@ public class Login {
                     String[] split = group.split("=");
                     loginBean.setAc_id(split[split.length - 1]);
                     System.out.println(ansi().fgBlue().a("获取到ac_id为" + split[split.length - 1]).reset());
+                 log.info("获取到ac_id为" + split[split.length - 1]);
 
                 } else {
                     loginBean.setAc_id("1");
