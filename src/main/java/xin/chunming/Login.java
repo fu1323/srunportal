@@ -282,7 +282,7 @@ public class Login {
         loginBean.setInfo(build);
         loginBean.setChksum(tools.chkSumCaculator(loginBean));
         System.out.println();
-        System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
+     //   System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
         log.info("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***"));
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
@@ -327,26 +327,26 @@ public class Login {
             String s = response.body() != null ? response.body().string() : "";
             if (response.isSuccessful()) {
                 System.out.println();
-                System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
+             //   System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
                 log.info("serverResponse: " + s);
                 if (s.contains("Login is successful")) {
-                    System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
+                   // System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
                     log.info("认证成功!");
                     return true;
                 } else if (s.contains("Password is error")) {
-                    System.out.println(ansi().fgRed().a("认证失败 用户名密码错误!").reset());
+                    //System.out.println(ansi().fgRed().a("认证失败 用户名密码错误!").reset());
                     log.info("认证失败 用户名密码错误!");
                     return false;
 
                 } else if (s.contains("login_error")) {
-                    System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
+                  //  System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
                     log.info("认证失败    原因:");
                     System.out.println(ansi().fgRed().a(s).reset());
                     return false;
                 }
 
             } else {
-                System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
+               // System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
                 log.info("登陆 发生问题: \n" + s);
                 return false;
             }

@@ -15,6 +15,7 @@ import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -179,10 +180,42 @@ public class Main {
 
 
             else {
-                log.info("正常");
+                if (checkbd(okhttp)){
+                    log.info("正常");
+                }else {
+                    log.info("网络不通,用默认设置登录? 回车确认");
+                    new Scanner(System.in);
+                    dologin(configFile, okhttp);
+
+
+                }
             }
 
         }
+    }
+
+
+    private static boolean checkbd(OkHttpClient okhttp) throws IOException {
+        Request request = new Request.Builder()
+                .url("https://www.baidu.com")
+                .build();
+        Response execute = null;
+
+        try {
+            execute = okhttp.newCall(request).execute();
+        } catch (IOException e) {
+            //throw new RuntimeException(e);
+            return false;
+
+        }
+
+
+        // System.out.println(execute.request().isHttps());
+        // System.out.println(execute.request().url().host());
+        String s = execute.body().string();
+        execute.close();
+        //System.out.println(s);
+        return s.contains("百度一下") ? true : false;
     }
 
 
