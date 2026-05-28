@@ -1,3 +1,10 @@
+hs.task.new("/usr/sbin/scutil", nil, {
+    "--nc",
+    "stop",
+    "Shadowrocket"
+}):start()
+ -- 关闭多余vpn,准备portal认证
+
 if hs.location.servicesEnabled() then
     hs.location.start()
     print("Location triggered:", hs.location.get())
