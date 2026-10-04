@@ -3,6 +3,7 @@ package xin.chunming;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import xin.chunming.bean.InfoBean;
@@ -23,7 +24,7 @@ import java.util.regex.Pattern;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-@Slf4j
+@Slf4j @Data
 public class Login {
 
     public static void setClient(OkHttpClient client) {
@@ -35,7 +36,7 @@ public class Login {
     }
 
     private static OkHttpClient client;
-    private static String tmpurl = "";
+    public static String tmpurl = "";
     private static Date date = new Date();
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,7 +48,7 @@ public class Login {
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
                 .build();
-
+       // System.out.println(loginBean.getRootURL());
         // 2. 构建 Request
         Request request = new Request.Builder()
                 .url(url)
@@ -67,6 +68,7 @@ public class Login {
             String s = response.body() != null ? response.body().string() : "";
             if (response.isSuccessful()) {
                 s = s.replace(loginBean.getCallback() + "(", "").replace(")", "");
+                System.err.println(s);
                 JsonNode jsonNode = objectMapper.readTree(s);
                 System.out.println(ansi().fgBlue().a("serverResponseUserInfo: " + s).reset());
 
@@ -120,8 +122,8 @@ public class Login {
 
     public static void ac_idSetter(LoginBean loginBean) throws IOException {
 // 1. 使用 HttpUrl.Builder 自动处理参数编码
-       // System.out.println(tmpurl);
-        HttpUrl url = HttpUrl.parse(tmpurl.isBlank()?"http://"+ loginBean.getTestip():tmpurl).newBuilder().build();
+        // System.out.println(tmpurl);
+        HttpUrl url = HttpUrl.parse(tmpurl.isBlank() ? "http://" + loginBean.getTestip() : tmpurl).newBuilder().build();
 
         // 2. 构建 Request
         Request request = new Request.Builder()
@@ -152,7 +154,7 @@ public class Login {
                     String[] split = group.split("=");
                     loginBean.setAc_id(split[split.length - 1]);
                     System.out.println(ansi().fgBlue().a("获取到ac_id为" + split[split.length - 1]).reset());
-                 log.info("获取到ac_id为" + split[split.length - 1]);
+                    log.info("获取到ac_id为" + split[split.length - 1]);
 
                 } else {
                     loginBean.setAc_id("1");
@@ -252,7 +254,7 @@ public class Login {
 
 
     public static void othersget(LoginBean loginBean) {
-        HttpUrl url = HttpUrl.parse( loginBean.getRootURL() + "/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
+        HttpUrl url = HttpUrl.parse(loginBean.getRootURL() + "/srun_portal_pc?ac_id=1&mac=38%3A97%3Ad6%3Aae%3A12%3A01&theme=pro&vlan_id1=0&vlan_id2=0").newBuilder()
                 .addQueryParameter("ac_id", loginBean.getAc_id())
                 .addQueryParameter("ip", loginBean.getIp())
                 .addQueryParameter("_", String.valueOf(date.getTime()))
@@ -283,7 +285,7 @@ public class Login {
         loginBean.setInfo(build);
         loginBean.setChksum(tools.chkSumCaculator(loginBean));
         System.out.println();
-     //   System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
+        //   System.out.println(ansi().fgBrightGreen().a("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***")).reset());
         log.info("loginInfo: " + loginBean.toString().replace(loginBean.getPassword(), "***"));
 /* String s1 = "http://192.168.88.7/cgi-bin/srun_portal?callback=" + loginBean.getCallback() +
                     "&action=" + loginBean.getAction() + "&username=" + loginBean.getUsername() + "&password=" + "{MD5}" + loginBean.getMd5Password() + "&os=" + loginBean.getOs() + "&name="
@@ -292,7 +294,7 @@ public class Login {
                     "&info=" + build +
                     "&ac_id=" + loginBean.getAc_id() + "&ip="
                     + loginBean.getIp() + "&n=" + loginBean.getN() + "&type=" + loginBean.getType() + "&_=" + date.getTime();*/
-        HttpUrl url = HttpUrl.parse( loginBean.getRootURL() + "/cgi-bin/srun_portal").newBuilder()
+        HttpUrl url = HttpUrl.parse(loginBean.getRootURL() + "/cgi-bin/srun_portal").newBuilder()
                 .addQueryParameter("callback", loginBean.getCallback())
                 .addQueryParameter("action", loginBean.getAction())
                 .addQueryParameter("username", loginBean.getUsername())
@@ -328,10 +330,10 @@ public class Login {
             String s = response.body() != null ? response.body().string() : "";
             if (response.isSuccessful()) {
                 System.out.println();
-             //   System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
+                //   System.out.println(ansi().fgBlue().a("serverResponse: " + s).reset());
                 log.info("serverResponse: " + s);
                 if (s.contains("Login is successful")) {
-                   // System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
+                    // System.out.println(ansi().fgBrightCyan().a("认证成功!").reset());
                     log.info("认证成功!");
                     return true;
                 } else if (s.contains("Password is error")) {
@@ -340,14 +342,14 @@ public class Login {
                     return false;
 
                 } else if (s.contains("login_error")) {
-                  //  System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
+                    //  System.out.println(ansi().fgRed().a("认证失败    原因:").reset());
                     log.info("认证失败    原因:");
                     System.out.println(ansi().fgRed().a(s).reset());
                     return false;
                 }
 
             } else {
-               // System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
+                // System.out.println(ansi().fgRed().a("登陆 发生问题: \n" + s).reset());
                 log.info("登陆 发生问题: \n" + s);
                 return false;
             }
@@ -360,6 +362,10 @@ public class Login {
         return false;
 
 
+    }
+
+    public static String getTmpurl() {
+        return tmpurl;
     }
 }
 

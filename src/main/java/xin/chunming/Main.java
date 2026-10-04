@@ -2,6 +2,7 @@ package xin.chunming;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -12,16 +13,20 @@ import xin.chunming.utils.tools;
 
 import java.io.*;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-@Slf4j
+@Slf4j @Data
 public class Main {
     private static String userName;
     private static String password;
@@ -55,6 +60,7 @@ public class Main {
             ObjectMapper objectMapper = new ObjectMapper();
             bufferedReader.close();
             JsonNode jsonNode = objectMapper.readTree(configJson.toString());
+            System.out.println(configJson.toString());
             try {
 
 
@@ -68,7 +74,30 @@ public class Main {
             }
 //            System.out.println(password);
 //            macAddr = jsonNode.get("mac_addr").asText().strip();
-            check(configFile, okHttpClient);
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+            // scheduleWithFixedDelay: 上次执行完毕后，再等3分钟
+            executor.scheduleWithFixedDelay(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                check(configFile, okHttpClient);
+                            } catch (Exception e) {
+                                log.error(e.getMessage());
+                                StackTraceElement[] stackTrace = e.getStackTrace();
+                                for (StackTraceElement stackTraceElement : stackTrace) {
+                                    log.error(stackTraceElement.toString());
+                                }
+
+                            }
+                        }
+                    },   // 要执行的方法
+                    0,              // 初始延迟（立即开始）
+                    5,           // 间隔
+                    TimeUnit.MINUTES
+            );
+
 
         } else {
             //System.out.println(ansi().fgRed().a("配置文件不存在,已生成,请填写srun_config.json! ").reset());
@@ -100,6 +129,7 @@ public class Main {
             lb.setN("200");
             lb.setType("1");
             lb.setRootURL(rootURL);
+            System.out.println(rootURL);
             lb.setTestip(testip == null ? "1.2.3.4" : testip);
 
             if (Login.wanipst(lb) ? (Login.challengeGet(lb) ? Login.login(lb) : false) : false) {
@@ -126,7 +156,7 @@ public class Main {
     }
 
     private static void check(File configFile, OkHttpClient okhttp) throws Exception {
-
+        System.out.println(testip);
         Request request = new Request.Builder()
                 .url("http://" + testip)  //
                 .build();
@@ -150,11 +180,12 @@ public class Main {
             String group = matcher.group();
             //System.out.println(group);
             Login.setTmpurl(group.replace("location.href=", "").replace("\"", ""));
-
+            System.out.println(group);
             if (group.contains(rootURL)) {
                 log.info("检测到Portal认证要求 准备认证");
-                String url = (execute.request().isHttps() ? "https://" : "http://") + execute.request().url().host() + "/";
-                rootURL = url;
+
+                String url = new URL(Login.tmpurl).getHost();
+                rootURL = Login.tmpurl.contains("https")?"https://":"http://"+url;
 
 
                 //  System.out.println("检测到Portal认证要求 准备认证");
